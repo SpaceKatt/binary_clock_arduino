@@ -8,7 +8,7 @@ const int rowPins[] = {6, 7, 8, 9};
 
 int secPerMin = 60;
 
-int globalCount = 1;
+int globalCount = 0;
 
 int seconds = 0;
 int minutes = 0;
@@ -64,15 +64,14 @@ void displaySeconds() {
   int decade = 1;
   
   for (int col = 0; col < 2; col++) {
-    temp = temp / decade; 
+    temp = seconds / decade % 10; 
     for (int row = 0; row < numRows; row++) {
       if (col + row > 3) {
         break;
       }
-      temp >>= 1;
 
 //      Serial.println(temp);
-      if (temp & mask) {
+      if ((temp >> row) & mask) {
         lightCoord(row, col);
         allOff();
       }
