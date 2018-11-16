@@ -1,6 +1,6 @@
 // cathodes
-const int numCols = 2;
-const int colPins[] = {4, 5};
+const int numCols = 4;
+const int colPins[] = {2, 3, 4, 5};
 
 // anodes
 const int numRows = 4;
@@ -58,19 +58,14 @@ void lightCoord(int x, int y) {
   digitalWrite(colPin, HIGH);
 }
 
-void displaySeconds() {
-  int temp = seconds;
+void displayTime(int value, int low_bound, int high_bound) {
+  int temp = value;
   int mask = 1;
   int decade = 1;
   
-  for (int col = 0; col < 2; col++) {
-    temp = seconds / decade % 10; 
+  for (int col = low_bound; col < high_bound; col++) {
+    temp = value / decade % 10; 
     for (int row = 0; row < numRows; row++) {
-      if (col + row > 3) {
-        break;
-      }
-
-//      Serial.println(temp);
       if ((temp >> row) & mask) {
         lightCoord(row, col);
         allOff();
@@ -87,13 +82,15 @@ void loop() {
   if (sysTime - lastTick > 1000) {
     lastTick = millis();
     globalCount++;
+//    globalCount += 30;
     Serial.println(seconds);
     seconds = globalCount % 60;
-    minutes = globalCount / 60 % 60;
-    hours = globalCount / 3600 % 24; 
+    minutes = (globalCount / 60) % 60;
+    hours = (globalCount / 3600) % 24; 
   }
   
   allOff();
   
-  displaySeconds();
+  displayTime(seconds, 0, 2);
+  displayTime(minutes, 2, 4);
 }
