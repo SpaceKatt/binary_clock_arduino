@@ -1,14 +1,14 @@
 // cathodes
-const int numCols = 4;
-const int colPins[] = {2, 3, 4, 5};
+const int numCols = 6;
+const int colPins[] = {2, 3, 4, 5, 6, 7};
 
 // anodes
 const int numRows = 4;
-const int rowPins[] = {6, 7, 8, 9};
+const int rowPins[] = {8, 9, 10, 11};
 
 int secPerMin = 60;
 
-int globalCount = 0;
+unsigned long globalCount = 0;
 
 int seconds = 0;
 int minutes = 0;
@@ -39,7 +39,7 @@ void setup() {
 }
 
 void allOff() {
-    // For dark, bring row high and col low
+  // For dark, bring row high and col low
   for (int i = 0; i < numCols; i++) {
     digitalWrite(colPins[i], LOW);
   }
@@ -63,15 +63,16 @@ void displayTime(int value, int low_bound, int high_bound) {
   int mask = 1;
   int decade = 1;
   
-  for (int col = low_bound; col < high_bound; col++) {
+  for (int col = high_bound - 1; col >= low_bound; col--) {
     temp = value / decade % 10; 
+
     for (int row = 0; row < numRows; row++) {
       if ((temp >> row) & mask) {
         lightCoord(row, col);
         allOff();
       }
-
     }
+
     decade *= 10;
   }
 }
@@ -82,15 +83,21 @@ void loop() {
   if (sysTime - lastTick > 1000) {
     lastTick = millis();
     globalCount++;
-//    globalCount += 30;
-    Serial.println(seconds);
+
     seconds = globalCount % 60;
     minutes = (globalCount / 60) % 60;
-    hours = (globalCount / 3600) % 24; 
+    hours = (globalCount / 3600) % 24;
+
+    Serial.print(hours);
+    Serial.print(":");
+    Serial.print(minutes);
+    Serial.print(":");
+    Serial.println(seconds);
   }
   
   allOff();
   
-  displayTime(seconds, 0, 2);
+  displayTime(seconds, 4, 6);
   displayTime(minutes, 2, 4);
+  displayTime(hours, 0, 2);
 }
